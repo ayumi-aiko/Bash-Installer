@@ -1,0 +1,90 @@
+#!/sbin/sh
+# Bash-Installer, a simple installer with multi-language support.
+# Copyright (C) 2025 愛子あゆみ
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# the current zip installer and the stdout.
+# to fix compatibility, we need to give the installer another variable to map to the
+# actual stdout of the installer, previously it was /proc/self/fd/1 but now it's something else
+# small edit, /proc/self/fd/1 didn't work on older versions but it did work on magisk and newer twrp bases
+OUTFD="$2"
+ZIPFILE="$3"
+
+# unpack language and put it in /dev/tmp/common.eternal so that the installer can take variables
+# from it and use the value to print it in the UI
+# but first, we need to get the current UI language and extract the file based on the language
+# if we dont have translations, just extract english and proceed.
+# but unfortunately, we can't get the actual language with getprop ro.product.locale,
+# so im gonna use the log to figure the current language out.
+# the situation here is that the language mentioned twice is the current language
+# jesus christ (not a christian but i love jesus)
+#
+# ayumi@DESKTOP-67EDP44:/mnt/c/Users/Luna/Desktop$ cat recovery.log | grep lan
+# I:PageManager::LoadFileToBuffer loading filename: '/twres/languages/zh_TW.xml' directly
+# I:PageManager::LoadFileToBuffer loading filename: '/twres/languages/zh_CN.xml' directly
+# parsing languageFile
+# parsing languageFile done
+# I:Loading page settings_language
+# I:Loading page select_language
+# I:PageManager::LoadFileToBuffer loading filename: '/twres/languages/zh_CN.xml' directly
+# parsing languageFile
+# parsing languageFile done
+# I:Set page: 'settings_language'
+
+# lets wait for the loop to continue finishing and switch to english once we dont have any langs added.
+for code in zh_TW zh_CN pt_PT pt_BR uk tr ru ja it id es; do
+    if [ "$(grep -c "$code" /tmp/recovery.log)" -ge 2 ]; then
+        lang_file="META-INF/com/google/android/languages/${code}.eternal"
+        if unzip -l "$ZIPFILE" | grep -q "$lang_file"; then
+            debugPrint "Info | update-binary: Chosen language: $code"
+            unzip -o "$ZIPFILE" "$lang_file" -d "/dev/tmp/"
+            break
+        fi
+    fi
+done
+
+# FUCK TWRP BRO I SWEAR TO THE FUCKING SATAN
+mkdir -p /dev/tmp
+
+# Default to English if the loop didn't extract "/dev/tmp/common.eternal"
+[ -f "/dev/tmp/${lang_file}" ] || unzip -o "$ZIPFILE" "META-INF/com/google/android/languages/english_UK.eternal" -d "/dev/tmp/"
+mv /dev/tmp/META-INF/com/google/android/languages/*.eternal "/tmp/common.lang"; rm -rf "/dev/tmp/META-INF"
+
+# check if we are being thrown to the magisk installer.
+if ps | grep zygote | grep -qv grep || ps -A 2>/dev/null | grep zygote | grep -qv grep; then
+    debugPrint "Error-Failure | update-binary: weird ass environment? dude ts pmo"
+    abortInstance --language live.env.error
+fi
+
+# setup volume key interpreter
+unzip -o "${ZIPFILE}" "bin/" -d "/dev/tmp"
+if uname -m | grep -qE "arm|aarch64"; then 
+    mv "/dev/tmp/bin/arm/keycheck" "/dev/tmp/keycheck"
+    chmod -R 0755 "/dev/tmp/"
+    rm -rf "/dev/tmp/bin"
+else
+    mv "/dev/tmp/bin/x86/keycheck" "/dev/tmp/keycheck"
+    chmod -R 0755 "/dev/tmp/"
+    rm -rf "/dev/tmp/bin"
+fi
+
+# unzip the file and throw the installer.sh to somewhere else and just 
+# let it handle the rest.
+for i in "installer.sh" "functions.sh"; do
+    unzip -o "${ZIPFILE}" "${i}" -d "/dev/tmp"
+done
+chmod +x /dev/tmp/{installer.sh,functions.sh}
+/dev/tmp/installer.sh "${ZIPFILE}" "${OUTFD}"
+rm -rf /dev/tmp
