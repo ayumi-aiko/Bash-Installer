@@ -69,12 +69,13 @@ if ps | grep zygote | grep -qv grep || ps -A 2>/dev/null | grep zygote | grep -q
 fi
 
 # setup volume key interpreter
-unzip -o "${ZIPFILE}" "bin/" -d "/dev/tmp"
 if uname -m | grep -qE "arm|aarch64"; then 
+    unzip -o "${ZIPFILE}" "bin/arm/keycheck" -d "/dev/tmp"
     mv "/dev/tmp/bin/arm/keycheck" "/dev/tmp/keycheck"
     chmod -R 0755 "/dev/tmp/"
     rm -rf "/dev/tmp/bin"
 else
+    unzip -o "${ZIPFILE}" "bin/x86/keycheck" -d "/dev/tmp"
     mv "/dev/tmp/bin/x86/keycheck" "/dev/tmp/keycheck"
     chmod -R 0755 "/dev/tmp/"
     rm -rf "/dev/tmp/bin"

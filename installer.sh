@@ -20,7 +20,7 @@ export ZIPFILE="$1"
 export OUTFD="$2"
 
 # import the dawn functions from the file, pretty clever decision tho ngl im proud of myself.
-command -v source && source /dev/tmp/functions.sh || . /dev/tmp/functions.sh
+command -v source &>/dev/null && source /dev/tmp/functions.sh || . /dev/tmp/functions.sh
 
 # print banner
 consolePrint "╔─────────────────────────────────────────────────────╗"
@@ -32,13 +32,8 @@ consolePrint "│   ██║   ███████║╚██████╔
 consolePrint "│   ╚═╝   ╚══════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝╚═╝  ╚═╝╚═╝  ╚═╝│"
 consolePrint "╚─────────────────────────────────────────────────────╝"
 consolePrint --language welcome.to.tsukika
-if /dev/tmp/keycheck; then 
-    touch /dev/tmp/new
-else
-    touch /dev/tmp/old
-    consolePrint --language testing.vol.keys
-    consolePrint --language press.volplus
-    chooseportold "UP"
-    consolePrint --language press.volminus
-    chooseportold "DOWN"
-fi
+consolePrint --language testing.vol.keys
+consolePrint --language press.volplus
+registerKeys "UP"
+consolePrint --language press.volminus
+registerKeys "DOWN"

@@ -121,56 +121,46 @@ function installImages() {
     esac
 }
 
-keytest() {
-    consolePrint --language testing.vol.keys
-    consolePrint --language press.volkey
-    if (timeout 3 /system/bin/getevent -lc 1 2>&1 | /system/bin/grep VOLUME | /system/bin/grep " DOWN" > /dev/tmp/events); then
-        return 0
-    else
-        consolePrint --language try.again.volkey
-        timeout 3 /dev/tmp/keycheck
-        [ $? -eq 143 ] && abortInstance --language volkey.not.detected || return 1
-    fi
-}
-
-chooseport() {
+registerKeys() {
+    local UP DOWN SEL
     while true; do
-        /system/bin/getevent -lc 1 2>&1 | /system/bin/grep VOLUME | /system/bin/grep " DOWN" > /dev/tmp/events
-        (`cat /dev/tmp/events 2>/dev/null | /system/bin/grep VOLUME >/dev/null`) && break;
-    done
-    (`cat /dev/tmp/events 2>/dev/null | /system/bin/grep VOLUMEUP >/dev/null`) && return 0 || return 1
-}
-
-chooseportold() {
-    while true; do
+        # Calling keycheck first time detects previous input. Calling it second time will do what we want
         /dev/tmp/keycheck
         /dev/tmp/keycheck
         local SEL=$?
         if [ "$1" == "UP" ]; then
             UP=$SEL
+            echo "$UP" > /tmp/volActionUp
             break
         elif [ "$1" == "DOWN" ]; then
             DOWN=$SEL
+            echo "$DOWN" > /tmp/volActionDown
             break
+        elif [ $SEL -eq $UP ]; then
+            return 1
+        elif [ $SEL -eq $DOWN ]; then
+            return 0
         fi
-        [ $SEL -eq $UP ] && return 0
-        [ $SEL -eq $DOWN ] && return 1
     done
+}
+
+whichVolumeKey() {
+    local SEL
+    /dev/tmp/keycheck
+    SEL="$?"
+    if [ "$(cat "/tmp/volActionUp")" == "${SEL}" ]; then
+        return 0
+    elif [ "$(cat "/tmp/volActionDown")" == "${SEL}" ]; then
+        return 1
+    else
+        debugPrint "Error | whichVolumeKey(): Unknown key register, here's the return value: ${SEL}"
+        return 1
+    fi
 }
 
 ask() {
     local languagevariable="$1"
-    if grep -q "$languagevariable" /dev/tmp/common.eternal; then
-        consolePrint "$(grep_prop "$languagevariable" /dev/tmp/common.eternal) (+ / -)"
-    else
-        consolePrint "$languagevariable (+ / -)"
-    fi
-    if [ -f /dev/tmp/old ]; then
-        chooseportold
-    elif [ -f /dev/tmp/new ]; then
-        chooseport
-    else
-        return 1
-    fi
+    grep -q "$languagevariable" /dev/tmp/common.eternal && consolePrint "$(grep_prop "$languagevariable" /dev/tmp/common.eternal) (+ / -)" || consolePrint "$languagevariable (+ / -)"
+    whichVolumeKey
 }
 # functions:

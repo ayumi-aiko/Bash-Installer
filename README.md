@@ -34,3 +34,10 @@ debugPrint "Error-Info|Error|Warning|Abort|Failure | <service>: <message>"
 ```bash
 amiMountedOrNot "<partition name, ex: system>"
 ```
+```bash
+if ask "<message>"; then
+    # this statement runs when volume up (+) is pressed
+else
+    # this statement runs when volume down (-) is pressed
+fi
+```
