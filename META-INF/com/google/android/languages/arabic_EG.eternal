@@ -1,0 +1,33 @@
+# Bash-Installer, a simple installer with multi-language support.
+# Copyright (C) 2025 愛子あゆみ
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# Language: Arabic
+# Translated by: ヤ 𝗭𝗚𝗫 | #𝐏𝐫𝐢𝐦𝐞𝐀𝐫𝐜
+
+# normal messages below:
+welcome.to.tsukika="أهلا بك في Tsukika!"
+
+# volume key setup messages below:
+testing.vol.keys="يتم اختبار ازرار الصوت..."
+press.volkey="- انقر على زر رفع/خفض الصوت"
+try.again.volkey="افعلها مجددا"
+volkey.not.detected="لم يتم العثور على أي زر صوت"
+press.volplus="- انقر على زر رفع الصوت (+)"
+press.volminus="انقر على زر خفض الصوت (-)"
+instruction.volkeyask="اضغط زر رفع الصوت (+) لاختيار \"نعم\" واضغط زر خفض الصوت (-) لاختيار \"لا\"."
+
+# error messages below:
+live.env.error="لا يمكنك تثبيت هذا في بيئة أندرويد مباشرة"
