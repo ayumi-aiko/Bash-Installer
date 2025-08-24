@@ -31,3 +31,17 @@ instruction.volkeyask="Press volume up (+) for \"Yes\" and volume down (-) for \
 
 # error messages below:
 live.env.error="You can't install this in a live android environment."
+installing.super.error="Failed to flash the super partition"
+installing.system.error="Failed to flash the system partition"
+installing.vendor.error="Failed to flash the vendor partition"
+flashing.kernel.error="Failed to flash the kernel! DON'T REBOOT THE DEVICE, FLASH A KERNEL RIGHT FREAKING NOW!"
+flashing.dtbo.error="Failed to flash the dtbo! DON'T REBOOT THE DEVICE, FLASH A KERNEL RIGHT FREAKING NOW!"
+flashing.dtb.error="Failed to flash the dtb! DON'T REBOOT THE DEVICE, FLASH A KERNEL RIGHT FREAKING NOW!"
+
+# installation messages below:
+installing.super="Installing super partition..."
+installing.system="Installing the system partition..."
+installing.vendor="Installing the vendor partition..."
+flashing.kernel="Flashing kernel.."
+flashing.dtbo="Flashing dtbo.."
+flashing.dtb="Flashing dtb.."
