@@ -121,7 +121,7 @@ function installImages() {
     esac
 }
 
-registerKeys() {
+function registerKeys() {
     local UP DOWN SEL
     while true; do
         # Calling keycheck first time detects previous input. Calling it second time will do what we want
@@ -144,7 +144,7 @@ registerKeys() {
     done
 }
 
-whichVolumeKey() {
+function whichVolumeKey() {
     local SEL
     /dev/tmp/keycheck
     SEL="$?"
@@ -158,9 +158,21 @@ whichVolumeKey() {
     fi
 }
 
-ask() {
+function ask() {
     local languagevariable="$1"
     grep -q "$languagevariable" /dev/tmp/common.eternal && consolePrint "$(grep_prop "$languagevariable" /dev/tmp/common.eternal) (+ / -)" || consolePrint "$languagevariable (+ / -)"
     whichVolumeKey
+}
+
+function setupBB() {
+    unzip -o "${ZIPFILE}" "bin/arm/busybox" -d "/dev/tmp"
+    mv "/dev/tmp/bin/arm/busybox" "/dev/tmp/busybox"
+    chmod -R 0755 "/dev/tmp/"
+    rm -rf "/dev/tmp/bin"
+    [ ! -f "/dev/tmp/busybox" ] && abortInstance --language bb.setup.failed
+}
+
+function busybox() {
+    /dev/tmp/busybox "$@"
 }
 # functions:

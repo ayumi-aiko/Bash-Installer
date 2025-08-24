@@ -75,10 +75,7 @@ if uname -m | grep -qE "arm|aarch64"; then
     chmod -R 0755 "/dev/tmp/"
     rm -rf "/dev/tmp/bin"
 else
-    unzip -o "${ZIPFILE}" "bin/x86/keycheck" -d "/dev/tmp"
-    mv "/dev/tmp/bin/x86/keycheck" "/dev/tmp/keycheck"
-    chmod -R 0755 "/dev/tmp/"
-    rm -rf "/dev/tmp/bin"
+    abortInstance --language unknown.architecture
 fi
 
 # unzip the file and throw the installer.sh to somewhere else and just 
